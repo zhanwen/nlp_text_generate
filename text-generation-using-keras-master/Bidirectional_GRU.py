@@ -4,9 +4,11 @@ import numpy as np
 import keras
 from keras import layers
 import jieba
+from time import *
+begin_time = time()
 
-
-whole = open('./text/白夜行.txt', encoding='utf-8').read()
+whole = open('./text/白夜行.txt', encoding='utf-8').read()[:1000]
+print(len(whole))
 all_words = list(jieba.cut(whole, cut_all=False))  # jieba分词
 words = sorted(list(set(all_words)))
 word_indices = dict((word, words.index(word)) for word in words)
@@ -39,7 +41,7 @@ model = keras.models.Model(main_input, output)
 
 optimizer = keras.optimizers.RMSprop(lr=3e-3)
 model.compile(loss='sparse_categorical_crossentropy', optimizer=optimizer)
-model.fit(x, y, epochs=20, batch_size=512, verbose=2)
+model.fit(x, y, epochs=2, batch_size=10, verbose=2)
 
 
 def sample(preds, temperature=1.0):
@@ -77,6 +79,8 @@ def write_2(model, temperature, word_num, begin_sentence):
         sys.stdout.flush()
 
 
+model.save('bilstm_gru_model.h5')
+
 begin_sentence = whole[50003: 50100]
 print("初始句：", begin_sentence[:30])
 begin_sentence = list(jieba.cut(begin_sentence, cut_all=False))
@@ -85,3 +89,7 @@ begin_sentence = list(jieba.cut(begin_sentence, cut_all=False))
 write_2(model, None, 300, begin_sentence)
 
 write_2(model, 0.5, 300, begin_sentence)
+
+end_time = time()
+run_time = end_time-begin_time
+print ('该循环程序运行时间：',run_time)

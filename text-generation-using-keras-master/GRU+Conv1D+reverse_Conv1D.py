@@ -4,9 +4,10 @@ import numpy as np
 import keras
 from keras import layers
 from collections import deque
+from time import *
+begin_time = time()
 
-
-whole = open('./text/西游记.txt', encoding='utf-8').read()
+whole = open('./text/train.txt', encoding='utf-8').read()[:2000000]
 
 maxlen = 30 # 正向序列长度
 revlen = 20 # 反向序列长度
@@ -62,7 +63,7 @@ model = keras.models.Model([normal_input, reverse_input, normal_input_2], output
 
 optimizer = keras.optimizers.RMSprop(lr=1e-3)
 model.compile(loss='sparse_categorical_crossentropy', optimizer=optimizer)
-model.fit({'normal': x, 'reverse': reverse_x, 'normal_2': x}, y, epochs=200, batch_size=1024, verbose=2)
+model.fit({'normal': x, 'reverse': reverse_x, 'normal_2': x}, y, epochs=20, batch_size=128, verbose=2)
 
 
 def sample(preds, temperature=1.0):
@@ -106,6 +107,7 @@ def write_3(model, temperature, word_num, begin_sentence):
         sys.stdout.write(next_word)
         sys.stdout.flush()
 
+model.save('gru_conv1d_reverse.h5')
 
 begin_sentence = whole[70000: 70100]
 print(begin_sentence[:30] + " //" + begin_sentence[30] + "// " + begin_sentence[31:51])
@@ -113,3 +115,7 @@ print(begin_sentence[:30] + " //" + begin_sentence[30] + "// " + begin_sentence[
 write_3(model, None, 500, begin_sentence)
 
 write_3(model, 0.5, 500, begin_sentence)
+
+end_time = time()
+run_time = end_time-begin_time
+print ('该循环程序运行时间：',run_time/3600)

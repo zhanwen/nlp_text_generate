@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 import sys
 import os
 import argparse
@@ -7,8 +8,14 @@ import re
 import tensorflow.compat.v1 as tf
 import numpy as np
 
-from train.modeling import GroverModel, GroverConfig, sample
+import os,sys
+current_dir = os.path.abspath(os.path.dirname(__file__))
+sys.path.append(current_dir)
+sys.path.append("../")
+
+from train_self.modeling import GroverModel, GroverConfig, sample
 from tokenization import tokenization
+
 
 ##### ignore tf deprecated warning temporarily
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -166,7 +173,7 @@ with tf.Session(config=tf_config, graph=tf.Graph()) as sess:
     tokens, probs = sample(news_config=news_config, initial_context=initial_context,
                            eos_token=eos_token, min_len=min_len, ignore_ids=None, p_for_topp=p_for_topp,
                            do_topk=False)
-
+    print(args.ckpt_fn)
     saver = tf.train.Saver()
     saver.restore(sess, args.ckpt_fn)
     print('🍺Model loaded. \nInput something please:⬇️')
